@@ -117,14 +117,13 @@
 
   <!-- Pied de page -->
   <footer class="text-center text-[10px] sm:text-xs text-slate-600 max-w-5xl mx-auto w-full pt-3 border-t border-slate-900">
-    Echo-Mind Engine v0.81 — WebGPU Mobile & Llama 3.2 1B Local.
+    Echo-Mind Engine v0.82 — WebGPU Mobile & Llama 3.2 1B Local.
   </footer>
 
   <!-- Script WebGPU avec WebLLM -->
   <script type="module">
     import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
-    // Modèle Llama 3.2 1B quantifié spécialement pour WebGPU mobile
     const SELECTED_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
     let engine = null;
 
@@ -229,19 +228,19 @@
     const chatInput = document.getElementById('chatInput');
     const sendChatBtn = document.getElementById('sendChatBtn');
 
-    // --- Initialisation du moteur WebGPU avec contournement de Cache local ---
+    // --- Initialisation WebGPU avec définition explicite du modèle ---
     async function initWebGPU() {
       try {
         await initDB();
         await render3DGraph();
 
         if (!navigator.gpu) {
-          statusText.textContent = "⚠️ WebGPU non supporté par ce navigateur ou protocole local.";
+          statusText.textContent = "⚠️ WebGPU non disponible. Utilisez Chrome / Safari récent.";
           statusDot.classList.add('bg-red-500');
           return;
         }
 
-        statusText.textContent = "Chargement de Llama 3.2 1B (WebGPU local)...";
+        statusText.textContent = "Chargement de Llama 3.2 1B (WebGPU)...";
 
         const initProgressCallback = (report) => {
           statusText.textContent = report.text;
@@ -250,14 +249,26 @@
           }
         };
 
-        // Utilisation de la configuration sans CacheStorage restrictif local
+        // Configuration avec injection explicite de la liste du modèle pour éviter A.model_list is undefined
+        const appConfig = {
+          useIndexedDBCache: false,
+          model_list: [
+            {
+              model_id: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
+              model: "https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC",
+              model_lib: webllm.modelLibURLPrefix + webllm.webLLMVersion + "/Llama-3.2-1B-Instruct-q4f16_1-ctx4k-webgpu.wasm",
+              vram_required_MB: 850,
+              low_resource_required: true,
+              required_features: ["shader-f16"]
+            }
+          ]
+        };
+
         engine = await webllm.CreateMLCEngine(
           SELECTED_MODEL,
           { 
             initProgressCallback: initProgressCallback,
-            appConfig: {
-              useIndexedDBCache: false
-            }
+            appConfig: appConfig
           }
         );
 
@@ -266,7 +277,6 @@
         statusDot.classList.remove('bg-amber-500', 'animate-pulse');
         statusDot.classList.add('bg-emerald-500');
 
-        // Activation des boutons
         processBtn.disabled = false;
         processBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
         processBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
