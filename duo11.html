@@ -1,0 +1,10 @@
+// Remplace la ligne CreateMLCEngine par ceci :
+engine = await webllm.CreateMLCEngine(
+  SELECTED_MODEL,
+  { 
+    initProgressCallback: initProgressCallback,
+    appConfig: {
+      useIndexedDBCache: false // Désactive le stockage en cache restreint par file://
+    }
+  }
+);
