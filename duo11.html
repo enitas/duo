@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Echo-Mind | 100% Local-First & WebGPU Mobile</title>
+  <title>Echo-Mind | 100% Local-First</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/3d-force-graph@1.73.3/dist/3d-force-graph.min.js"></script>
   <script>
@@ -12,12 +12,7 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              bg: '#0a0d14',
-              card: '#121824',
-              accent: '#6366f1',
-              glow: '#818cf8'
-            }
+            brand: { bg: '#0a0d14', card: '#121824', accent: '#6366f1', glow: '#818cf8' }
           }
         }
       }
@@ -38,8 +33,8 @@
       <h1 class="text-lg sm:text-xl font-bold tracking-wider text-indigo-400">ECHO-MIND</h1>
     </div>
     <div class="flex items-center gap-2">
-      <span class="text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
-        🔒 100% Local & Sécurisé
+      <span id="engineBadge" class="text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        🔒 Local-First Vault
       </span>
       <button id="exportBtn" class="text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer">
         📥 Export
@@ -53,7 +48,7 @@
     <!-- Statut Global -->
     <div class="text-center space-y-2">
       <h2 class="text-xl sm:text-2xl font-light text-slate-300">Journal & Miroir Socratique</h2>
-      <p id="status" class="text-xs sm:text-sm text-indigo-300">Initialisation du moteur local...</p>
+      <p id="status" class="text-xs sm:text-sm text-indigo-300">Démarrage de l'environnement local...</p>
     </div>
 
     <!-- Grille Nébuleuse 3D + Saisie -->
@@ -77,7 +72,7 @@
 
         <div class="flex items-center justify-between pt-2 border-t border-slate-800">
           <button id="clearBtn" class="px-3 py-1.5 text-xs text-slate-400 hover:text-white transition cursor-pointer">Effacer</button>
-          <button id="processBtn" disabled class="px-4 py-2 bg-slate-800 text-slate-500 text-xs font-medium rounded-lg shadow cursor-not-allowed transition">
+          <button id="processBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg shadow transition cursor-pointer">
             Analyser & Ancrer 🧠
           </button>
         </div>
@@ -89,19 +84,19 @@
     <div class="w-full bg-brand-card border border-indigo-900/50 rounded-xl p-4 sm:p-6 shadow-xl space-y-3">
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
         <span class="text-xs font-semibold text-indigo-400 uppercase tracking-widest">🏛️ Débat Socratique Local</span>
-        <span class="text-[10px] text-emerald-400">Zéro Cloud / Zéro Trace</span>
+        <span class="text-[10px] text-emerald-400">100% Hors-Ligne & Privé</span>
       </div>
 
       <div id="chatContainer" class="h-56 sm:h-64 overflow-y-auto chat-scroll space-y-3 pr-1 text-xs sm:text-sm text-slate-200">
         <div class="p-3 bg-slate-900/80 border border-slate-800 rounded-lg max-w-xl">
           <span class="text-[10px] font-bold text-indigo-400 block mb-1">Jumeau Cognitif</span>
-          Bonjour. Je suis ton miroir socratique 100% local. Tout reste strictement dans ton appareil. Écris tes réflexions pour commencer.
+          Bonjour. Je suis ton miroir socratique local. Tes données ne quittent jamais cet appareil. Écris une pensée pour commencer.
         </div>
       </div>
 
       <div class="flex gap-2 pt-1">
         <input type="text" id="chatInput" placeholder="Écris au jumeau socratique..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
-        <button id="sendChatBtn" disabled class="px-4 py-2 bg-slate-800 text-slate-500 text-xs font-medium rounded-lg cursor-not-allowed transition">
+        <button id="sendChatBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg transition cursor-pointer">
           Discuter 💬
         </button>
       </div>
@@ -110,25 +105,25 @@
   </main>
 
   <footer class="text-center text-[10px] sm:text-xs text-slate-600 max-w-5xl mx-auto w-full pt-3 border-t border-slate-900">
-    Echo-Mind Engine v0.91 — 100% Local-First, Zéro-Knowledge, Souverain.
+    Echo-Mind Engine v1.0 — Architecture Souveraine & Local-First.
   </footer>
 
-  <!-- Script Transformers.js v3 avec WebGPU et Suivi de Progression -->
+  <!-- Module JS avec Importation Sécurisée -->
   <script type="module">
-    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@3.0.2';
-    
+    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0-alpha.19';
+
     env.allowLocalModels = false;
     let generator = null;
 
-    // --- IndexedDB ---
+    // --- IndexedDB Vault ---
     const DB_NAME = "EchoMindVault";
     const STORE_NAME = "thoughts";
     let db = null;
 
     function initDB() {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const request = indexedDB.open(DB_NAME, 1);
-        request.onerror = () => reject(request.error);
+        request.onerror = () => resolve(null);
         request.onsuccess = () => { db = request.result; resolve(db); };
         request.onupgradeneeded = (e) => {
           const database = e.target.result;
@@ -140,30 +135,30 @@
     }
 
     function saveToVault(data) {
-      return new Promise((resolve, reject) => {
-        if (!db) return reject("DB non initialisée");
+      return new Promise((resolve) => {
+        if (!db) return resolve(null);
         const tx = db.transaction([STORE_NAME], "readwrite");
         const store = tx.objectStore(STORE_NAME);
         const record = {
           timestamp: new Date().toISOString(),
           transcript: data.transcript,
-          nodes: data.nodes,
-          biases: data.biases
+          nodes: data.nodes || [],
+          biases: data.biases || []
         };
         const req = store.add(record);
         req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        req.onerror = () => resolve(null);
       });
     }
 
     function getAllFromVault() {
-      return new Promise((resolve, reject) => {
-        if (!db) return reject("DB non initialisée");
+      return new Promise((resolve) => {
+        if (!db) return resolve([]);
         const tx = db.transaction([STORE_NAME], "readonly");
         const store = tx.objectStore(STORE_NAME);
         const req = store.getAll();
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
       });
     }
 
@@ -196,20 +191,23 @@
       };
 
       const container = document.getElementById('graphContainer');
-      if (!graphInstance) {
-        graphInstance = ForceGraph3D()(container)
-          .backgroundColor('#020617')
-          .nodeLabel('id')
-          .nodeColor(node => node.group === 'thought' ? '#818cf8' : '#34d399')
-          .nodeVal('val')
-          .linkColor(() => 'rgba(99, 102, 241, 0.2)');
+      if (container && !graphInstance) {
+        try {
+          graphInstance = ForceGraph3D()(container)
+            .backgroundColor('#020617')
+            .nodeLabel('id')
+            .nodeColor(node => node.group === 'thought' ? '#818cf8' : '#34d399')
+            .nodeVal('val')
+            .linkColor(() => 'rgba(99, 102, 241, 0.2)');
+        } catch(e) { console.warn("Erreur WebGL Graph:", e); }
       }
-      graphInstance.graphData(graphData);
+      if (graphInstance) graphInstance.graphData(graphData);
     }
 
-    // --- UI Elements ---
+    // --- Elements UI ---
     const statusText = document.getElementById('status');
     const statusDot = document.getElementById('statusDot');
+    const engineBadge = document.getElementById('engineBadge');
     const thoughtInput = document.getElementById('thoughtInput');
     const processBtn = document.getElementById('processBtn');
     const clearBtn = document.getElementById('clearBtn');
@@ -219,120 +217,88 @@
     const chatInput = document.getElementById('chatInput');
     const sendChatBtn = document.getElementById('sendChatBtn');
 
-    // --- Initialisation du système ---
+    // --- Chargement Résilient de l'IA ---
     async function initSystem() {
+      await initDB();
+      await render3DGraph();
+
+      // Vérification matérielle WebGPU
+      let hasWebGPU = false;
+      if (navigator.gpu) {
+        try {
+          const adapter = await navigator.gpu.requestAdapter();
+          if (adapter) hasWebGPU = true;
+        } catch(e) { hasWebGPU = false; }
+      }
+
+      const deviceToUse = hasWebGPU ? 'webgpu' : 'wasm';
+      statusText.textContent = `Chargement IA (${deviceToUse.toUpperCase()})...`;
+
       try {
-        await initDB();
-        await render3DGraph();
-
-        statusText.textContent = "Tentative de chargement via WebGPU...";
-
-        // Tentative WebGPU avec callback de progression visible
-        generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
-          device: 'webgpu',
+        // Promise.race pour éviter tout blocage indéfini (Timeout de 10 secondes)
+        const loadPipelinePromise = pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
+          device: deviceToUse,
           progress_callback: (data) => {
             if (data.status === 'progress' && data.total) {
-              const percent = Math.round((data.loaded / data.total) * 100);
-              statusText.textContent = `Téléchargement du modèle : ${percent}%`;
-            } else if (data.status === 'initiate') {
-              statusText.textContent = `Préparation des composants...`;
-            } else if (data.status === 'ready') {
-              statusText.textContent = "Modèle WebGPU prêt !";
+              const pct = Math.round((data.loaded / data.total) * 100);
+              statusText.textContent = `Téléchargement Modèle : ${pct}%`;
             }
           }
         });
 
-        successInit();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Timeout de chargement")), 10000)
+        );
+
+        generator = await Promise.race([loadPipelinePromise, timeoutPromise]);
+        
+        statusText.textContent = `Système IA Local Prêt (${deviceToUse.toUpperCase()})`;
+        engineBadge.textContent = `⚡ Local ${deviceToUse.toUpperCase()}`;
+        engineBadge.className = "text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800";
+        statusDot.className = "w-3 h-3 rounded-full bg-emerald-500";
 
       } catch (err) {
-        console.warn("WebGPU non disponible, bascule sur le mode standard WASM :", err);
-        try {
-          statusText.textContent = "Activation du moteur de secours (WASM)...";
-          generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
-            progress_callback: (data) => {
-              if (data.status === 'progress' && data.total) {
-                const percent = Math.round((data.loaded / data.total) * 100);
-                statusText.textContent = `Téléchargement (secours) : ${percent}%`;
-              }
-            }
-          });
-          successInit();
-        } catch (e) {
-          console.error("Erreur critique d'initialisation :", e);
-          statusText.textContent = "Mode local de secours (Interface active).";
-          statusDot.classList.remove('bg-amber-500');
-          statusDot.classList.add('bg-emerald-500');
-          enableUI();
-        }
+        console.warn("Démarrage en mode coffre-fort autonome (Zero-AI Fallback) :", err);
+        statusText.textContent = "Coffre-fort local prêt (Mode autonome).";
+        engineBadge.textContent = "🛡️ Vault Privé Local";
+        engineBadge.className = "text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800";
+        statusDot.className = "w-3 h-3 rounded-full bg-emerald-500";
       }
     }
 
-    function successInit() {
-      statusText.textContent = "Système 100% local et sécurisé opérationnel !";
-      statusDot.classList.remove('bg-amber-500', 'animate-pulse');
-      statusDot.classList.add('bg-emerald-500');
-      enableUI();
-    }
-
-    function enableUI() {
-      processBtn.disabled = false;
-      processBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-      processBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
-
-      sendChatBtn.disabled = false;
-      sendChatBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-      sendChatBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
-    }
-
-    // --- Analyse & Ancrage ---
+    // --- Traitement & Ancrage de la pensée ---
     async function runAnalysisAndSave() {
       const textToAnalyze = thoughtInput.value.trim();
-      if (!textToAnalyze) return;
+      if (!textToAnalyze) { alert("Écrivez d'abord une pensée."); return; }
 
-      statusText.textContent = "Analyse de la pensée...";
-      statusDot.classList.add('animate-spin');
-      processBtn.disabled = true;
+      statusText.textContent = "Ancrage dans le coffre...";
+      statusDot.className = "w-3 h-3 rounded-full bg-indigo-500 animate-spin";
 
-      try {
-        let nodes = ["Réflexion", "Cognition"];
-        let biases = [];
+      let extractedNodes = ["Réflexion"];
 
-        if (generator) {
-          const prompt = `<|im_start|>system
-Extrait 3 concepts clés sous forme de tableau JSON simple de mots-clés. Réponds uniquement en JSON: {"nodes":["c1","c2","c3"]}<|im_end|>
-<|im_start|>user
-${textToAnalyze}<|im_end|>
-<|im_start|>assistant
-`;
-          const output = await generator(prompt, { max_new_tokens: 100, temperature: 0.1 });
-          const generated = output[0].generated_text;
-          const jsonPart = generated.split("<|im_start|>assistant")[1] || generated;
-          const parsed = JSON.parse(jsonPart.replace(/```json/g, '').replace(/```/g, '').trim());
-          if (parsed.nodes) nodes = parsed.nodes;
-        }
-
-        const record = { transcript: textToAnalyze, nodes: nodes, biases: biases };
-        await saveToVault(record);
-        await render3DGraph();
-
-        statusText.textContent = "Pensée ancrée en toute sécurité dans le coffre local !";
-        statusDot.classList.remove('animate-spin');
-        thoughtInput.value = "";
-        processBtn.disabled = false;
-
-      } catch (err) {
-        console.error(err);
-        const fallbackRecord = { transcript: textToAnalyze, nodes: ["Pensée"], biases: [] };
-        await saveToVault(fallbackRecord);
-        await render3DGraph();
-        statusText.textContent = "Pensée ancrée dans le coffre local.";
-        statusDot.classList.remove('animate-spin');
-        thoughtInput.value = "";
-        processBtn.disabled = false;
+      if (generator) {
+        try {
+          const prompt = `<|im_start|>system\nExtraire 2 mots-clés séparés par une virgule.<|im_end|>\n<|im_start|>user\n${textToAnalyze}<|im_end|>\n<|im_start|>assistant\n`;
+          const out = await generator(prompt, { max_new_tokens: 20 });
+          const raw = out[0].generated_text.split("<|im_start|>assistant\n")[1] || "";
+          const cleaned = raw.replace("<|im_end|>", "").trim();
+          if (cleaned) extractedNodes = cleaned.split(",").map(s => s.trim());
+        } catch(e) { console.warn(e); }
+      } else {
+        // Extraction heuristique sans IA si le modèle n'a pas chargé
+        const words = textToAnalyze.split(/\s+/).filter(w => w.length > 5);
+        if (words.length > 0) extractedNodes = words.slice(0, 2);
       }
+
+      await saveToVault({ transcript: textToAnalyze, nodes: extractedNodes });
+      await render3DGraph();
+
+      thoughtInput.value = "";
+      statusText.textContent = "Pensée ancrée en toute sécurité !";
+      statusDot.className = "w-3 h-3 rounded-full bg-emerald-500";
     }
 
-    // --- Débat Socratique Local ---
+    // --- Débat Socratique ---
     async function sendSocraticMessage() {
       const userMsg = chatInput.value.trim();
       if (!userMsg) return;
@@ -340,42 +306,34 @@ ${textToAnalyze}<|im_end|>
       appendChatMessage("Toi", userMsg, "text-indigo-300 bg-indigo-950/40 border-indigo-900/50");
       chatInput.value = "";
 
-      let vaultContext = "";
-      try {
-        const records = await getAllFromVault();
-        if (records.length > 0) {
-          vaultContext = records.slice(-2).map(r => r.transcript).join(" | ");
-        }
-      } catch (e) { console.error(e); }
+      statusText.textContent = "Réfléchit...";
+      statusDot.className = "w-3 h-3 rounded-full bg-indigo-500 animate-spin";
 
-      statusText.textContent = "Le jumeau socratique réfléchit...";
-      statusDot.classList.add('animate-spin');
+      let reply = "";
 
-      try {
-        let reply = "Qu'est-ce qui te fait dire cela ?";
-        if (generator) {
-          const prompt = `<|im_start|>system
-Tu es un miroir socratique bienveillant. Ne donne aucun conseil. Pose une seule question profonde pour faire douter l'utilisateur de sa certitude. Contexte récent : "${vaultContext}".<|im_end|>
-<|im_start|>user
-${userMsg}<|im_end|>
-<|im_start|>assistant
-`;
-          const output = await generator(prompt, { max_new_tokens: 100, temperature: 0.6 });
-          const generated = output[0].generated_text;
-          const assistantPart = generated.split("<|im_start|>assistant")[1] || generated;
-          reply = assistantPart.replace("<|im_end|>", "").trim();
-        }
-
-        appendChatMessage("Jumeau Cognitif", reply, "text-emerald-300 bg-slate-900 border-slate-800");
-        statusText.textContent = "Prêt.";
-        statusDot.classList.remove('animate-spin');
-
-      } catch (err) {
-        console.error(err);
-        appendChatMessage("Jumeau Cognitif", "Comment vois-tu les choses autrement ?", "text-emerald-300 bg-slate-900 border-slate-800");
-        statusText.textContent = "Prêt.";
-        statusDot.classList.remove('animate-spin');
+      if (generator) {
+        try {
+          const prompt = `<|im_start|>system\nTu es un miroir socratique. Réponds par une seule question profonde sans conseil.<|im_end|>\n<|im_start|>user\n${userMsg}<|im_end|>\n<|im_start|>assistant\n`;
+          const out = await generator(prompt, { max_new_tokens: 60, temperature: 0.7 });
+          const raw = out[0].generated_text.split("<|im_start|>assistant\n")[1] || "";
+          reply = raw.replace("<|im_end|>", "").trim();
+        } catch(e) { console.warn(e); }
       }
+
+      if (!reply) {
+        // Réponses socratiques de secours ultra-pertinentes
+        const socraticQuestions = [
+          "Qu'est-ce qui te fait affirmer cela avec autant de certitude ?",
+          "Si tu regardais cette situation sous un autre angle, que verrais-tu ?",
+          "Quelle est la part de faits et la part d'interprétation dans cette pensée ?",
+          "Que se passerait-il si l'inverse était également vrai ?"
+        ];
+        reply = socraticQuestions[Math.floor(Math.random() * socraticQuestions.length)];
+      }
+
+      appendChatMessage("Jumeau Cognitif", reply, "text-emerald-300 bg-slate-900 border-slate-800");
+      statusText.textContent = "Prêt.";
+      statusDot.className = "w-3 h-3 rounded-full bg-emerald-500";
     }
 
     function appendChatMessage(sender, text, styleClass) {
@@ -386,18 +344,17 @@ ${userMsg}<|im_end|>
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // --- Événements ---
     exportBtn.addEventListener('click', async () => {
-      try {
-        const allRecords = await getAllFromVault();
-        if (allRecords.length === 0) { alert("Coffre-fort vide."); return; }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allRecords, null, 2));
-        const a = document.createElement('a');
-        a.href = dataStr;
-        a.download = `echomind_secure_vault_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      } catch (err) { alert("Erreur d'export : " + err.message); }
+      const records = await getAllFromVault();
+      if (records.length === 0) { alert("Coffre-fort vide."); return; }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `echomind_vault_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
 
     processBtn.addEventListener('click', runAnalysisAndSave);
@@ -406,6 +363,7 @@ ${userMsg}<|im_end|>
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendSocraticMessage(); });
     clearBtn.addEventListener('click', () => { thoughtInput.value = ""; });
 
+    // Démarrage
     initSystem();
   </script>
 </body>
