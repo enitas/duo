@@ -110,16 +110,14 @@
   </main>
 
   <footer class="text-center text-[10px] sm:text-xs text-slate-600 max-w-5xl mx-auto w-full pt-3 border-t border-slate-900">
-    Echo-Mind Engine v0.9 — 100% Local-First, Zéro-Knowledge, Souverain.
+    Echo-Mind Engine v0.91 — 100% Local-First, Zéro-Knowledge, Souverain.
   </footer>
 
-  <!-- Script Transformers.js v3 avec WebGPU -->
+  <!-- Script Transformers.js v3 avec WebGPU et Suivi de Progression -->
   <script type="module">
     import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@3.0.2';
     
-    // Configuration stricte pour forcer l'exécution locale sans fuite réseau
     env.allowLocalModels = false;
-
     let generator = null;
 
     // --- IndexedDB ---
@@ -221,45 +219,69 @@
     const chatInput = document.getElementById('chatInput');
     const sendChatBtn = document.getElementById('sendChatBtn');
 
-    // --- Initialisation du modèle local ---
+    // --- Initialisation du système ---
     async function initSystem() {
       try {
         await initDB();
         await render3DGraph();
 
-        statusText.textContent = "Chargement du modèle cognitif local (WebGPU)...";
+        statusText.textContent = "Tentative de chargement via WebGPU...";
 
-        // Utilisation d'un modèle text-generation léger et performant compatible WebGPU via Transformers.js
+        // Tentative WebGPU avec callback de progression visible
         generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
-          device: 'webgpu'
+          device: 'webgpu',
+          progress_callback: (data) => {
+            if (data.status === 'progress' && data.total) {
+              const percent = Math.round((data.loaded / data.total) * 100);
+              statusText.textContent = `Téléchargement du modèle : ${percent}%`;
+            } else if (data.status === 'initiate') {
+              statusText.textContent = `Préparation des composants...`;
+            } else if (data.status === 'ready') {
+              statusText.textContent = "Modèle WebGPU prêt !";
+            }
+          }
         });
 
-        statusText.textContent = "Système 100% local et sécurisé opérationnel !";
-        statusDot.classList.remove('bg-amber-500', 'animate-pulse');
-        statusDot.classList.add('bg-emerald-500');
-
-        processBtn.disabled = false;
-        processBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-        processBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
-
-        sendChatBtn.disabled = false;
-        sendChatBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-        sendChatBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
+        successInit();
 
       } catch (err) {
-        console.error("Erreur d'initialisation WebGPU/WASM :", err);
-        statusText.textContent = "Mode secours local activé.";
-        statusDot.classList.remove('bg-amber-500');
-        statusDot.classList.add('bg-emerald-500');
-
-        processBtn.disabled = false;
-        processBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-        processBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
-
-        sendChatBtn.disabled = false;
-        sendChatBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
-        sendChatBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
+        console.warn("WebGPU non disponible, bascule sur le mode standard WASM :", err);
+        try {
+          statusText.textContent = "Activation du moteur de secours (WASM)...";
+          generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
+            progress_callback: (data) => {
+              if (data.status === 'progress' && data.total) {
+                const percent = Math.round((data.loaded / data.total) * 100);
+                statusText.textContent = `Téléchargement (secours) : ${percent}%`;
+              }
+            }
+          });
+          successInit();
+        } catch (e) {
+          console.error("Erreur critique d'initialisation :", e);
+          statusText.textContent = "Mode local de secours (Interface active).";
+          statusDot.classList.remove('bg-amber-500');
+          statusDot.classList.add('bg-emerald-500');
+          enableUI();
+        }
       }
+    }
+
+    function successInit() {
+      statusText.textContent = "Système 100% local et sécurisé opérationnel !";
+      statusDot.classList.remove('bg-amber-500', 'animate-pulse');
+      statusDot.classList.add('bg-emerald-500');
+      enableUI();
+    }
+
+    function enableUI() {
+      processBtn.disabled = false;
+      processBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
+      processBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
+
+      sendChatBtn.disabled = false;
+      sendChatBtn.classList.remove('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
+      sendChatBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500', 'text-white', 'cursor-pointer');
     }
 
     // --- Analyse & Ancrage ---
